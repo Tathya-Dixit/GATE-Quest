@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── NextAuth Models ───────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── App Models ────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+
+  accounts     Account[]
+  sessions     Session[]
+  gameSessions GameSession[]
+  quizResults  QuizResult[]
+  badges       Badge[]
+  streak       Streak?
+}
+
+model Subject {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  description String
+  order       Int        @default(0)
+  subtopics   Subtopic[]
+}
+
+model Subtopic {
+  id        String @id @default(cuid())
+  name      String
+  slug      String
+  subjectId String
+  order     Int    @default(0)
+
+  subject      Subject       @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  gameSessions GameSession[]
+  quizResults  QuizResult[]
+  badges       Badge[]
+
+  @@unique([subjectId, slug])
+}
+
+model GameSession {
+  id         String   @id @default(cuid())
+  userId     String
+  subtopicId String
+  gameType   String   // "flashcard" | "sort-steps"
+  score      Int      @default(0)
+  maxScore   Int      @default(0)
+  completed  Boolean  @default(false)
+  playedAt   DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subtopic Subtopic @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+}
+
+model QuizResult {
+  id         String   @id @default(cuid())
+  userId     String
+  subtopicId String
+  score      Int
+  maxScore   Int      @default(5)
+  percentage Float
+  takenAt    DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subtopic Subtopic @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+}
+
+model Badge {
+  id         String   @id @default(cuid())
+  userId     String
+  subtopicId String
+  tier       String   // "gold" | "silver" | "bronze"
+  earnedAt   DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subtopic Subtopic @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, subtopicId])
+}
+
+model Streak {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  currentStreak Int      @default(0)
+  longestStreak Int      @default(0)
+  lastActiveAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

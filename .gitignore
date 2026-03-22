@@ -39,3 +39,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/app/generated/prisma
+
+# AI Workspaces and Confidential
+.agents/
+.agent/
+_agents/
+_agent/
+.gemini/
+.claude/
+.cursor/
+.cursorrules
+.antigravity/
+.cline/

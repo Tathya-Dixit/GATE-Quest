@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎯 GATE Quest
 
-## Getting Started
+Modern, Gamified Learning Platform for GATE CS Aspirants. Built with Next.js 15, React 19, Prisma, SQLite, and NextAuth.
 
-First, run the development server:
+## ✨ Features and Functionalities
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### 🛡️ Authentication & User Persistence
+- **Secure Google Sign-In** with NextAuth.js.
+- **Demo Mode** for testing the complete loop without a real account.
+- **Protected Routes** that automatically redirect unauthenticated users to the sleek landing page.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 📊 Dashboard & Progression Tracking
+- **Unified Analytics**: Track Games Played, Badges Earned, and Daily Streak.
+- **Daily Streak System**: Log in and play games daily to build your 🔥 streak.
+- **Progress Badges**: Earn Gold 🥇, Silver 🥈, or Bronze 🥉 badges based on your performance in topic quizzes. 
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 📚 Course Navigation
+- Categorized Gateway to subjects like **Discrete Mathematics**, **Operating Systems**, and **Data Structures**.
+- Deep-dive into specific subtopics containing bite-sized learning games.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 🎮 Gamified Learning Engine
+- **Flashcard Flip**: Master core definitions, bounds, and terminologies interactively. 
+- **Sort the Steps**: Test algorithm knowledge by ordering algorithmic steps sequentially (e.g., Dijkstra's Algorithm).
+- Both games feature rich micro-animations and feedback loops.
 
-## Learn More
+### 📝 Assessment Quizzes
+- Automatically appended to the end of a mini-game session.
+- Validates the exact knowledge learned during the mini-game.
+- Awards experience points and badges dynamically upon submission.
 
-To learn more about Next.js, take a look at the following resources:
+### 🏆 Global Leaderboard
+- A competitive arena calculating points using a heuristic algorithm:
+  - Badges (50pts each)
+  - Game Sessions completed (10pts each)
+  - Current Daily Streak (10pts per day)
+- Real-time ranking against other GATE aspirants.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 🎨 Premium UI/UX Design
+- **Glassmorphism Elements**: Beautiful blurred backgrounds and floating cards.
+- **Dynamic Theme System**: Toggleable Dark/Light mode, saved persistently in localStorage.
+- Responsive, mobile-friendly data tables and navigation sidebars.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Getting Started
 
-## Deploy on Vercel
+1. Clone the repository
+2. Install dependencies: \`npm install\`
+3. Set your environment variables (Google OAuth IDs, Database URL).
+4. Run Prisma database migrations: \`npx prisma db push\`
+5. Start the development server: \`npm run dev\`
+6. Open [http://localhost:3000](http://localhost:3000)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+*Built as the MVP for a Gamified Learning Capstone.*
