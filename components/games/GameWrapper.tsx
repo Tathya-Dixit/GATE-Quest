@@ -119,6 +119,16 @@ export function GameWrapper({ subtopic, gameType, gameData, quizData, userId }: 
             timeBonus={timeBonusState}
           />
         )}
+
+        {gameState === "done" && !quizResultData && (
+          <div className="card empty-state" style={{ marginTop: '2rem' }}>
+            <h3>Something went wrong</h3>
+            <p>Could not load the quiz results. Please try again.</p>
+            <button className="btn-primary" onClick={() => router.push(`/subjects/${subtopic.subject.slug}`)} style={{ marginTop: '1rem' }}>
+              Back to Subject
+            </button>
+          </div>
+        )}
       </div>
 
       

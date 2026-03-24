@@ -133,17 +133,22 @@ export async function POST(req: Request) {
     // Add streak bonus
     if (finalStreakCount > 1) xpEarned += XP_VALUES.STREAK_BONUS;
 
-    const updatedUser = await prisma.user.update({
+    const currentUser = await prisma.user.findUnique({
       where: { id: userId },
-      data: { xp: { increment: xpEarned } },
       select: { xp: true, level: true }
     });
 
-    const previousLevel = updatedUser.level;
+    const previousLevel = currentUser ? getLevelFromXP(currentUser.xp) : 1;
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { xp: { increment: xpEarned } },
+      select: { xp: true }
+    });
 
     // Recalculate level
     const newLevel = getLevelFromXP(updatedUser.xp);
-    if (newLevel !== updatedUser.level) {
+    if (newLevel !== (currentUser?.level || 1)) {
       await prisma.user.update({
         where: { id: userId },
         data: { level: newLevel }

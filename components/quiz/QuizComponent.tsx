@@ -65,9 +65,12 @@ export function QuizComponent({ questions, onComplete }: QuizComponentProps) {
       setCurrentIndex(currentIndex + 1);
       setSelectedOption(null);
       setIsAnswered(false);
-      setTimeLeft(30);
     }
   };
+
+  useEffect(() => {
+    setTimeLeft(30);
+  }, [currentIndex]);
 
   return (
     <div className="quiz-container card">

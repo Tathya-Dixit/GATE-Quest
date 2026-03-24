@@ -1558,7 +1558,7 @@ button {
 .btn-okay { background-color: rgba(245,158,11,0.12); color: var(--warning); border: 1px solid rgba(245,158,11,0.3); }
 .btn-easy { background-color: rgba(16,185,129,0.12); color: var(--success); border: 1px solid rgba(16,185,129,0.3); }
 .btn-hard:hover, .btn-okay:hover, .btn-easy:hover { filter: brightness(0.92); transform: translateY(-2px); }
-.controls { display: flex !important; gap: 1rem !important; margin-top: 2.5rem !important; }
+.flashcard-container .controls { display: flex; gap: 1rem; margin-top: 2.5rem; transition: all 0.3s ease; }
 
 /* Feature 6: Quiz Timer */
 .timer-container { position: relative; width: 56px; height: 56px; margin: 0 auto 1.5rem; }

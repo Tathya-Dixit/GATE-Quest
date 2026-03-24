@@ -53,7 +53,7 @@ export default async function DashboardPage() {
 
       {streakQuery && (
         <StreakBanner 
-          lastActiveAt={streakQuery.lastActiveAt} 
+          lastActiveAt={streakQuery.lastActiveAt.toISOString()} 
           currentStreak={currentStreak} 
         />
       )}
