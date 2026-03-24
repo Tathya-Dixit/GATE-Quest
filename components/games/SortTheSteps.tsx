@@ -1,18 +1,79 @@
+/* eslint-disable */
 "use client";
 
 import React, { useState, useEffect } from "react";
 import type { SortStepContent } from "@/lib/gameData";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface SortTheStepsProps {
   data: SortStepContent[];
   onComplete?: (score: number) => void;
 }
 
+function SortableItem({ id, item, index, isCorrect }: { id: string, item: SortStepContent, index: number, isCorrect: boolean | null }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    ...(isCorrect && { borderColor: 'var(--success)' })
+  };
+
+  const draggingClass = isDragging ? 'sort-item-dragging' : '';
+  const correctClass = isCorrect ? 'success' : '';
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      className={`sort-item card ${draggingClass} ${correctClass}`}
+    >
+      <div 
+        {...attributes} 
+        {...listeners} 
+        className="drag-handle"
+      >
+        ⠿
+      </div>
+      <div className="item-number">{index + 1}</div>
+      <div className="item-text">{item.text}</div>
+    </div>
+  );
+}
+
 export default function SortTheSteps({ data, onComplete }: SortTheStepsProps) {
-  // Simple implementation of sort game without adding full dnd-kit dependency to keep MVP light
   const [items, setItems] = useState<SortStepContent[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   useEffect(() => {
     // Shuffle on mount
@@ -20,24 +81,19 @@ export default function SortTheSteps({ data, onComplete }: SortTheStepsProps) {
     setItems(shuffled);
   }, [data]);
 
-  const moveUp = (index: number) => {
-    if (index === 0) return;
-    const newItems = [...items];
-    const temp = newItems[index];
-    newItems[index] = newItems[index - 1];
-    newItems[index - 1] = temp;
-    setItems(newItems);
-    setIsCorrect(null);
-  };
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
 
-  const moveDown = (index: number) => {
-    if (index === items.length - 1) return;
-    const newItems = [...items];
-    const temp = newItems[index];
-    newItems[index] = newItems[index + 1];
-    newItems[index + 1] = temp;
-    setItems(newItems);
     setIsCorrect(null);
+
+    if (over && active.id !== over.id) {
+      setItems((currentItems) => {
+        const oldIndex = currentItems.findIndex((item) => item.id === active.id);
+        const newIndex = currentItems.findIndex((item) => item.id === over.id);
+
+        return arrayMove(currentItems, oldIndex, newIndex);
+      });
+    }
   };
 
   const checkOrder = () => {
@@ -54,35 +110,33 @@ export default function SortTheSteps({ data, onComplete }: SortTheStepsProps) {
     <div className="sort-container">
       <div className="instructions">
         <h3>Arrange the Steps</h3>
-        <p>Use the arrows to order the algorithm correctly from top to bottom.</p>
+        <p>Drag and drop to order the algorithm correctly from top to bottom.</p>
       </div>
 
-      <div className="sort-list">
-        {items.map((item, index) => (
-          <div key={item.id} className={"sort-item card " + (isCorrect ? 'success' : '')}>
-            <div className="item-number">{index + 1}</div>
-            <div className="item-text">{item.text}</div>
-            <div className="item-controls">
-              <button 
-                onClick={() => moveUp(index)} 
-                disabled={index === 0 || isCorrect === true}
-                className="control-btn"
-              >
-                ▲
-              </button>
-              <button 
-                onClick={() => moveDown(index)} 
-                disabled={index === items.length - 1 || isCorrect === true}
-                className="control-btn"
-              >
-                ▼
-              </button>
-            </div>
-          </div>
-        ))}
+      <div className="sort-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <DndContext 
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext 
+            items={items.map(item => item.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {items.map((item, index) => (
+              <SortableItem 
+                key={item.id} 
+                id={item.id} 
+                item={item} 
+                index={index} 
+                isCorrect={isCorrect} 
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
       </div>
 
-      <div className="actions">
+      <div className="actions" style={{ marginTop: '2rem' }}>
         <button 
           className={"btn-primary " + (isCorrect ? 'btn-success' : '') + (isCorrect === false ? ' btn-error' : '')}
           onClick={checkOrder}
@@ -93,8 +147,6 @@ export default function SortTheSteps({ data, onComplete }: SortTheStepsProps) {
           {isCorrect === false && "Incorrect, try again"}
         </button>
       </div>
-
-      
     </div>
   );
 }

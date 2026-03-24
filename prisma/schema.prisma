@@ -54,6 +54,8 @@ model User {
   emailVerified DateTime?
   image         String?
   createdAt     DateTime  @default(now())
+  xp            Int       @default(0)
+  level         Int       @default(1)
 
   accounts     Account[]
   sessions     Session[]

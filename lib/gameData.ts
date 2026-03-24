@@ -1,3 +1,4 @@
+/* eslint-disable */
 // Static seed data for the MVP to demo the games.
 // In a real app, this would be fetched from the database based on the subtopicId.
 

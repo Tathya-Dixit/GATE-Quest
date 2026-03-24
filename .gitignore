@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+dev.db
 
 # debug
 npm-debug.log*
@@ -43,13 +44,6 @@ next-env.d.ts
 /app/generated/prisma
 
 # AI Workspaces and Confidential
-.agents/
-.agent/
-_agents/
-_agent/
-.gemini/
-.claude/
-.cursor/
-.cursorrules
-.antigravity/
-.cline/
+AGENTS.md
+CLAUDE.md
+GEMINI.md

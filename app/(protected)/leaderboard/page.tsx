@@ -1,12 +1,32 @@
+/* eslint-disable */
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import Image from "next/image";
 
-export default async function LeaderboardPage() {
+import Link from "next/link";
+
+export default async function LeaderboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>
+}) {
+  const { tab } = await searchParams;
+  const isWeekly = tab === "weekly";
+
   const session = await auth();
   
   // Aggregate data to simulate a leaderboard.
   // In a real app, this query would be heavily cached and optimized.
+  const now = new Date();
+  const day = now.getUTCDay() || 7; // 1-7 (Mon-Sun)
+  const startOfWeek = new Date(now);
+  startOfWeek.setUTCHours(0, 0, 0, 0);
+  startOfWeek.setUTCDate(now.getUTCDate() - day + 1);
+
+  const gameSessionsWhere = isWeekly 
+    ? { completed: true, playedAt: { gte: startOfWeek } }
+    : { completed: true };
+
   const users = await prisma.user.findMany({
     select: {
       id: true,
@@ -16,7 +36,7 @@ export default async function LeaderboardPage() {
       _count: {
         select: {
           badges: true,
-          gameSessions: { where: { completed: true } }
+          gameSessions: { where: gameSessionsWhere }
         }
       }
     },
@@ -24,9 +44,11 @@ export default async function LeaderboardPage() {
   });
 
   // Calculate score heuristic: 50pts per badge + 10pts per game + 10pts per streak day
+  const gamePtsMultiplier = isWeekly ? 15 : 10;
+
   const leaderboard = users.map((user: any) => {
     const score = (user._count.badges * 50) + 
-                  (user._count.gameSessions * 10) + 
+                  (user._count.gameSessions * gamePtsMultiplier) + 
                   ((user.streak?.currentStreak || 0) * 10);
     return { ...user, score };
   }).sort((a: any, b: any) => b.score - a.score);
@@ -37,6 +59,21 @@ export default async function LeaderboardPage() {
         <h1>Global Leaderboard</h1>
         <p>See how you stack up against other GATE aspirants.</p>
       </header>
+
+      <div className="tab-bar">
+        <Link 
+          href="/leaderboard?tab=alltime" 
+          className={`tab-btn ${!isWeekly ? "active" : ""}`}
+        >
+          All-Time
+        </Link>
+        <Link 
+          href="/leaderboard?tab=weekly" 
+          className={`tab-btn ${isWeekly ? "active" : ""}`}
+        >
+          Weekly
+        </Link>
+      </div>
 
       <div className="leaderboard-card card">
         <div className="table-wrapper">

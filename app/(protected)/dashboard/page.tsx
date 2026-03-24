@@ -1,6 +1,9 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import XPBar from "@/components/ui/XPBar";
+import StreakBanner from "@/components/ui/StreakBanner";
+import { getSubjectMeta } from "@/lib/subjectMeta";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -11,7 +14,8 @@ export default async function DashboardPage() {
   }
 
   // Fetch dashboard stats concurrently
-  const [streakQuery, gamesPlayed, totalBadges, subjects] = await Promise.all([
+  const [user, streakQuery, gamesPlayed, totalBadges, subjects] = await Promise.all([
+    prisma.user.findUnique({ where: { id: userId }, select: { xp: true, level: true } }),
     prisma.streak.findUnique({ where: { userId } }),
     prisma.gameSession.count({ where: { userId, completed: true } }),
     prisma.badge.count({ where: { userId } }),
@@ -40,7 +44,19 @@ export default async function DashboardPage() {
             <span className="streak-label">Streak</span>
           </div>
         </div>
+        {user && (
+          <div style={{ width: '100%', marginTop: '0.5rem' }}>
+            <XPBar xp={user.xp} level={user.level} />
+          </div>
+        )}
       </header>
+
+      {streakQuery && (
+        <StreakBanner 
+          lastActiveAt={streakQuery.lastActiveAt} 
+          currentStreak={currentStreak} 
+        />
+      )}
 
       <div className="stats-grid">
         <div className="stat-card">
@@ -74,16 +90,19 @@ export default async function DashboardPage() {
           </div>
           
           <div className="subject-cards">
-            {subjects.map((subject) => (
-              <Link href={`/subjects/${subject.slug}`} key={subject.id} className="subject-card card">
-                <div className="subject-icon">📚</div>
+            {subjects.map((subject) => {
+              const meta = getSubjectMeta(subject.slug);
+              return (
+              <Link href={`/subjects/${subject.slug}`} key={subject.id} className="subject-card card" style={{ borderTop: `3px solid ${meta.color}` }}>
+                <div className="subject-icon" style={{ color: meta.color }}>{meta.icon}</div>
                 <div className="subject-details">
                   <h3>{subject.name}</h3>
                   <p>{subject._count.subtopics} topics available</p>
                 </div>
                 <div className="card-action">Play &rarr;</div>
               </Link>
-            ))}
+              );
+            })}
           </div>
         </section>
 

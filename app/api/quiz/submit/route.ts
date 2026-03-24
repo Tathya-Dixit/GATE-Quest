@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { XP_VALUES, getLevelFromXP } from "@/lib/xp";
 
 export async function POST(req: Request) {
   try {
@@ -77,6 +78,7 @@ export async function POST(req: Request) {
     today.setHours(0, 0, 0, 0);
 
     const existingStreak = await prisma.streak.findUnique({ where: { userId } });
+    let finalStreakCount = 1;
 
     if (!existingStreak) {
       await prisma.streak.create({
@@ -97,6 +99,7 @@ export async function POST(req: Request) {
       if (diffDays === 1) {
         // Active yesterday, increment streak
         const newStreak = existingStreak.currentStreak + 1;
+        finalStreakCount = newStreak;
         await prisma.streak.update({
           where: { id: existingStreak.id },
           data: {
@@ -107,6 +110,7 @@ export async function POST(req: Request) {
         });
       } else if (diffDays > 1) {
         // Missed a day, reset streak
+        finalStreakCount = 1;
         await prisma.streak.update({
           where: { id: existingStreak.id },
           data: {
@@ -114,11 +118,39 @@ export async function POST(req: Request) {
             lastActiveAt: new Date(),
           },
         });
+      } else {
+        finalStreakCount = existingStreak.currentStreak;
       }
       // If diffDays === 0, they already played today, leave streak as is.
     }
 
-    return NextResponse.json({ success: true });
+    // 4b. Award XP
+    let xpEarned = XP_VALUES.QUIZ_NO_BADGE;
+    if (badge === 'gold') xpEarned = XP_VALUES.QUIZ_GOLD;
+    else if (badge === 'silver') xpEarned = XP_VALUES.QUIZ_SILVER;
+    else if (badge === 'bronze') xpEarned = XP_VALUES.QUIZ_BRONZE;
+
+    // Add streak bonus
+    if (finalStreakCount > 1) xpEarned += XP_VALUES.STREAK_BONUS;
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { xp: { increment: xpEarned } },
+      select: { xp: true, level: true }
+    });
+
+    const previousLevel = updatedUser.level;
+
+    // Recalculate level
+    const newLevel = getLevelFromXP(updatedUser.xp);
+    if (newLevel !== updatedUser.level) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { level: newLevel }
+      });
+    }
+
+    return NextResponse.json({ success: true, xpEarned, newLevel, previousLevel, streakCount: finalStreakCount });
   } catch (error) {
     console.error("Quiz submit error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

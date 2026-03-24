@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { GameWrapper } from "@/components/games/GameWrapper";

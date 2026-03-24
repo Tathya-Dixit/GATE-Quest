@@ -11,21 +11,24 @@ interface FlashcardFlipProps {
 export default function FlashcardFlip({ data, onComplete }: FlashcardFlipProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [knownCount, setKnownCount] = useState(0);
+  const [confidenceScores, setConfidenceScores] = useState<('hard' | 'okay' | 'easy')[]>([]);
 
   const card = data[currentIndex];
   const isLast = currentIndex === data.length - 1;
 
-  const handleNext = (known: boolean) => {
+  const handleNext = (confidence: 'hard' | 'okay' | 'easy') => {
     setIsFlipped(false);
     
     // Tiny timeout to allow flip animation before changing content
     setTimeout(() => {
-      const newKnownCount = known ? knownCount + 1 : knownCount;
-      if (known) setKnownCount(newKnownCount);
+      const newScores = [...confidenceScores, confidence];
+      setConfidenceScores(newScores);
 
       if (isLast) {
-        if (onComplete) onComplete(newKnownCount);
+        if (onComplete) {
+          const easyCount = newScores.filter(s => s === 'easy').length;
+          onComplete(easyCount);
+        }
       } else {
         setCurrentIndex(currentIndex + 1);
       }
@@ -62,11 +65,14 @@ export default function FlashcardFlip({ data, onComplete }: FlashcardFlipProps) 
       </div>
 
       <div className={"controls " + (isFlipped ? 'visible' : '')}>
-        <button className="btn-action btn-review" onClick={() => handleNext(false)}>
-          Need Review
+        <button className="btn-action btn-hard" onClick={() => handleNext('hard')}>
+          <span style={{ fontSize: '1.25rem' }}>😕</span> Still Learning
         </button>
-        <button className="btn-action btn-got-it" onClick={() => handleNext(true)}>
-          Got It!
+        <button className="btn-action btn-okay" onClick={() => handleNext('okay')}>
+          <span style={{ fontSize: '1.25rem' }}>😐</span> Getting There
+        </button>
+        <button className="btn-action btn-easy" onClick={() => handleNext('easy')}>
+          <span style={{ fontSize: '1.25rem' }}>😄</span> Got It!
         </button>
       </div>
 
