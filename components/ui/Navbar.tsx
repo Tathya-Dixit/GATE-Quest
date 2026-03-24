@@ -37,53 +37,62 @@ export function Navbar() {
 
       <style jsx>{`
         .navbar {
-          height: 70px;
-          background-color: var(--bg-primary);
-          border-bottom: 1px solid var(--border-color);
+          height: 80px;
+          background: var(--glass-bg);
+          backdrop-filter: blur(12px);
+          border-bottom: 1px solid var(--glass-border);
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 1.5rem;
+          padding: 0 2rem;
           position: sticky;
           top: 0;
-          z-index: 10;
+          z-index: 90;
         }
 
         .navbar-right {
           display: flex;
           align-items: center;
-          gap: 1rem;
+          gap: 1.5rem;
         }
 
         .user-profile {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
-          padding: 0.25rem 0.5rem;
-          border-radius: 20px;
-          background-color: var(--bg-tertiary);
-          border: 1px solid var(--border-color);
+          gap: 1rem;
+          padding: 0.5rem 1rem;
+          padding-left: 0.5rem;
+          border-radius: 24px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid var(--glass-border);
+          transition: all 0.2s ease;
+        }
+
+        .user-profile:hover {
+          background: rgba(255, 255, 255, 0.1);
+          transform: translateY(-1px);
         }
 
         .avatar {
           border-radius: 50%;
-          border: 2px solid var(--border-color);
-          background-color: var(--brand-primary);
+          border: 3px solid var(--glass-border);
+          background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
           color: white;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-weight: bold;
-          font-size: 1rem;
-          width: 36px;
-          height: 36px;
+          font-weight: 800;
+          font-size: 1.1rem;
+          width: 40px;
+          height: 40px;
+          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
 
         .user-name {
-          font-size: 0.9rem;
-          font-weight: 500;
+          font-size: 1rem;
+          font-weight: 700;
           color: var(--text-primary);
-          margin-right: 0.5rem;
+          margin-right: 0.25rem;
         }
       `}</style>
     </header>

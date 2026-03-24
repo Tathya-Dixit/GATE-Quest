@@ -33,7 +33,9 @@ export function Sidebar() {
                   href={item.href}
                   className={`nav-link ${isActive ? "active" : ""}`}
                 >
-                  <span className="nav-icon">{item.icon}</span>
+                  <div className="nav-icon-wrapper">
+                    <span className="nav-icon">{item.icon}</span>
+                  </div>
                   <span className="nav-label">{item.label}</span>
                 </Link>
               </li>
@@ -44,49 +46,55 @@ export function Sidebar() {
 
       <div className="sidebar-footer">
         <button className="nav-link logout-btn" onClick={() => signOut()}>
-          <span className="nav-icon">🚪</span>
+          <div className="nav-icon-wrapper">
+            <span className="nav-icon">🚪</span>
+          </div>
           <span className="nav-label">Sign Out</span>
         </button>
       </div>
 
       <style jsx>{`
         .sidebar {
-          width: 260px;
+          width: 280px;
           height: 100vh;
-          background-color: var(--bg-secondary);
-          border-right: 1px solid var(--border-color);
           display: flex;
           flex-direction: column;
           position: sticky;
           top: 0;
           flex-shrink: 0;
+          z-index: 100;
+          padding: 1rem 0;
         }
 
         .sidebar-header {
-          height: 70px;
+          height: 80px;
           display: flex;
           align-items: center;
-          padding: 0 1.5rem;
-          border-bottom: 1px solid var(--border-color);
+          padding: 0 2rem;
+          margin-bottom: 2rem;
         }
 
         .logo {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
-          font-weight: 700;
-          font-size: 1.25rem;
-          color: var(--brand-primary);
+          gap: 1rem;
+          font-weight: 900;
+          font-size: 1.5rem;
+          background: linear-gradient(135deg, var(--text-primary), var(--brand-primary));
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          letter-spacing: -0.5px;
         }
 
         .logo-icon {
-          font-size: 1.5rem;
+          font-size: 1.75rem;
+          filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.3));
         }
 
         .sidebar-nav {
           flex: 1;
-          padding: 1.5rem 1rem;
-          overflow-y: auto;
+          padding: 0 1rem;
         }
 
         .nav-list {
@@ -96,49 +104,89 @@ export function Sidebar() {
           gap: 0.5rem;
         }
 
+        .nav-item {
+          position: relative;
+        }
+
         .nav-link {
           display: flex;
           align-items: center;
           gap: 1rem;
-          padding: 0.75rem 1rem;
-          border-radius: 8px;
+          padding: 0.875rem 1rem;
+          border-radius: 12px;
           color: var(--text-secondary);
-          font-weight: 500;
-          transition: all 0.2s ease;
+          font-weight: 600;
+          font-size: 0.95rem;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           width: 100%;
-          text-align: left;
+          border: 1px solid transparent;
+          background: transparent;
         }
 
         .nav-link:hover {
-          background-color: var(--bg-tertiary);
-          color: var(--text-primary);
+          background: hsla(243, 75%, 59%, 0.05);
+          color: var(--brand-primary);
+          transform: translateY(-1px);
         }
 
         .nav-link.active {
-          background-color: var(--brand-primary);
-          color: white;
+          background: hsla(243, 75%, 59%, 0.1);
+          color: var(--brand-primary);
+          box-shadow: inset 0 0 0 1px hsla(243, 75%, 59%, 0.1);
         }
 
-        .nav-icon {
-          font-size: 1.25rem;
+        .nav-link.active::before {
+          content: "";
+          position: absolute;
+          left: -4px;
+          top: 20%;
+          bottom: 20%;
+          width: 4px;
+          background: var(--brand-primary);
+          border-radius: 0 4px 4px 0;
+          box-shadow: 2px 0 10px var(--brand-primary);
+        }
+
+        .nav-icon-wrapper {
+          width: 32px;
+          height: 32px;
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 24px;
+          border-radius: 8px;
+          background: var(--bg-tertiary);
+          font-size: 1.1rem;
+          transition: all 0.2s ease;
+          border: 1px solid var(--border-color);
+        }
+
+        .nav-link:hover .nav-icon-wrapper,
+        .nav-link.active .nav-icon-wrapper {
+          background: var(--brand-primary);
+          color: white;
+          border-color: var(--brand-primary);
+          box-shadow: 0 4px 10px hsla(243, 75%, 59%, 0.3);
+          transform: scale(1.1);
+        }
+
+        .nav-label {
+          flex: 1;
         }
 
         .sidebar-footer {
-          padding: 1.5rem 1rem;
-          border-top: 1px solid var(--border-color);
+          padding: 1rem;
+          margin-top: auto;
         }
 
         .logout-btn {
-          color: var(--danger);
+          color: var(--text-secondary);
+          opacity: 0.7;
         }
 
         .logout-btn:hover {
-          background-color: rgb(var(--danger) / 0.1);
+          background: hsla(0, 72%, 51%, 0.1);
           color: var(--danger);
+          opacity: 1;
         }
       `}</style>
     </aside>

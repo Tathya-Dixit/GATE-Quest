@@ -51,38 +51,44 @@ export default function ResultScreen({
   }
 
   return (
-    <div className="done-screen card animate-slide-in" style={{ textAlign: "center", maxWidth: "400px", margin: "0 auto" }}>
-      <div style={{ fontSize: "5rem", marginBottom: "0.5rem", lineHeight: 1 }}>{badgeEmoji}</div>
-      <h2 style={{ marginBottom: "1.5rem", color: "var(--text-primary)" }}>{badgeLabel}</h2>
+    <div className="done-screen card animate-slide-in">
+      <div className="badge-display">
+        <div className="badge-emoji-large">{badgeEmoji}</div>
+        <h2 className="badge-title">{badgeLabel}</h2>
+      </div>
       
-      <div style={{ marginBottom: "1.5rem" }}>
-        <div style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--text-primary)" }}>{quizScore} / {maxScore} correct</div>
-        <div style={{ color: "var(--text-secondary)", fontWeight: 500 }}>{percentage}% Score</div>
+      <div className="result-stats">
+        <div className="score-main">{quizScore} / {maxScore} correct</div>
+        <div className="score-pct">{percentage}% Accuracy</div>
         {timeBonus > 0 && (
-          <div style={{ color: "var(--success)", fontWeight: 600, fontSize: "0.9rem", marginTop: "0.5rem" }}>
+          <div className="speed-bonus">
             ⏱️ Speed Bonus: +{timeBonus} pts
           </div>
         )}
       </div>
 
-      <div className="xp-gained" style={{ marginBottom: "1.5rem" }}>
+      <div className="xp-gained">
         +{xpEarned} XP
       </div>
 
       {newLevel > previousLevel && (
-        <div className="level-up-banner" style={{ marginBottom: "1.5rem" }}>
-          🎉 Level Up! You reached Level {newLevel}
+        <div className="level-up-banner">
+          <span className="party-icon">🎉</span>
+          <div className="level-up-text">
+            <strong>Level Up!</strong>
+            <p>You reached Level {newLevel}</p>
+          </div>
         </div>
       )}
 
-      <div style={{ marginBottom: "2rem", fontWeight: 700, color: "var(--warning)" }}>
+      <div className="streak-result">
         🔥 {streakCount} Day Streak!
       </div>
 
-      <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexDirection: "column" }}>
+      <div className="done-actions">
         <button 
           onClick={() => router.push(`/subjects/${subtopic.subject.slug}`)} 
-          style={{ padding: "0.75rem 1.5rem", borderRadius: "8px", border: "2px solid var(--border-color)", fontWeight: 600, color: "var(--text-primary)", backgroundColor: "transparent" }}
+          className="btn-secondary"
         >
           Back to Topics
         </button>
@@ -93,6 +99,34 @@ export default function ResultScreen({
           Go to Dashboard
         </button>
       </div>
+
+      <style jsx>{`
+        .badge-display { margin-bottom: 2rem; }
+        .badge-emoji-large { font-size: 5rem; line-height: 1; margin-bottom: 0.5rem; animation: badge-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .badge-title { color: var(--text-primary); font-size: 1.75rem; font-weight: 800; }
+        
+        .result-stats { margin-bottom: 2rem; }
+        .score-main { fontSize: 1.25rem; fontWeight: 700; color: var(--text-primary); }
+        .score-pct { color: var(--text-secondary); fontWeight: 500; }
+        .speed-bonus { color: var(--success); fontWeight: 700; fontSize: 0.9rem; marginTop: 0.5rem; animation: fadeInUp 0.5s ease 0.8s both; }
+
+        .level-up-text { display: flex; flexDirection: column; gap: 0.25rem; textAlign: left; }
+        .level-up-text strong { fontSize: 1.1rem; color: var(--text-primary); }
+        .level-up-text p { fontSize: 0.9rem; margin: 0; }
+        .party-icon { fontSize: 2rem; }
+
+        .streak-result { margin-bottom: 2rem; fontWeight: 800; color: var(--warning); fontSize: 1.1rem; }
+        
+        .done-actions { display: flex; flex-direction: column; gap: 1rem; width: 100%; }
+        .btn-secondary { padding: 0.75rem 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); font-weight: 600; color: var(--text-primary); background: var(--bg-tertiary); }
+        .btn-secondary:hover { background: var(--border-color); transform: translateY(-2px); }
+
+        @keyframes badge-pop {
+          0% { transform: scale(0); rotate: -20deg; }
+          70% { transform: scale(1.1); rotate: 10deg; }
+          100% { transform: scale(1); rotate: 0deg; }
+        }
+      `}</style>
     </div>
   );
 }
